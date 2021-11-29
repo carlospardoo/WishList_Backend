@@ -18,18 +18,21 @@ public class WishListDTO {
 
     private Product product;
 
+    private String state;
+
     public WishListDTO() {
 
     }
 
     public WishListDTO(long id, LocalDateTime createDate, LocalDateTime updateDate, 
-        int quantity, Client client, Product product) {
+        int quantity, Client client, Product product, String state) {
         this.id = id;
         this.createDate = createDate;
         this.updateDate = updateDate;
         this.quantity = quantity;
         this.client = client;
         this.product = product;
+        this.state = state;
     }
 
     public long getId() {
@@ -80,5 +83,18 @@ public class WishListDTO {
         this.product = product;
     }
 
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    @Override
+    public String toString() {
+        return "WishListDTO [client=" + client + ", createDate=" + createDate + ", id=" + id + ", product=" + product
+                + ", quantity=" + quantity + ", state=" + state + ", updateDate=" + updateDate + "]";
+    }
     
 }

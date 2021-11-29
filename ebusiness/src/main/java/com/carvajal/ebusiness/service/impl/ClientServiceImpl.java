@@ -1,8 +1,11 @@
 package com.carvajal.ebusiness.service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import com.carvajal.ebusiness.dao.ClientDAO;
+import com.carvajal.ebusiness.dto.ClientDTO;
 import com.carvajal.ebusiness.model.Client;
 import com.carvajal.ebusiness.service.ClientService;
 
@@ -29,5 +32,20 @@ public class ClientServiceImpl implements ClientService {
         else{
             return Optional.empty();
         }
+    }
+
+    @Override
+    public List<ClientDTO> getAllClients() {
+        List<Client> clientList = (List<Client>)cliDAO.findAll();
+        List<ClientDTO> clientDTO = new ArrayList<>();
+        clientList.forEach(cli->{
+            clientDTO.add(new ClientDTO(
+                cli.getDocument(), 
+                cli.getName(), 
+                cli.getUsername()
+            ));
+        });
+
+        return clientDTO;
     }
 }

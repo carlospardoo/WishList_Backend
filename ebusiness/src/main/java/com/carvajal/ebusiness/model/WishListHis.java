@@ -13,108 +13,133 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "wishlist")
+@Table(name = "wishlist_his")
 //@IdClass(value = WishList.class)
-public class WishList implements Serializable{
+public class WishListHis implements Serializable{
     
-    @Id()
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "wl_id")
+    @Column(name = "wlh_id")
     private long id;
 
-    /*@Id
-    @Column(name = "wl_client")
-    //@ManyToOne
-    //@JoinColumn(name = "cliDocument", referencedColumnName = "cli_id")
-    private long cliDocument;
+    @ManyToOne
+    @JoinColumn(name = "wlh_wishlist_id", referencedColumnName = "wl_id")
+    private WishList wishList;
 
-    @Id
-    @Column(name = "wl_product")
-    //@ManyToOne
-    //@JoinColumn(name = "proId", referencedColumnName = "pro_id")
-    private int proId;*/
-
-    @Column(name = "wl_createdate")
+    @Column(name = "wlh_createdate")
     private LocalDateTime createDate;
 
-    @Column(name = "wl_updatedate")
+    @Column(name = "wlh_updatedate")
     private LocalDateTime updateDate;
 
-    @Column(name = "wl_quantity")
+    @Column(name = "wlh_quantity")
     private int quantity;
 
     @ManyToOne
-    @JoinColumn(name = "wl_client", referencedColumnName = "cli_id")
+    @JoinColumn(name = "wlh_client", referencedColumnName = "cli_id")
     private Client client;
 
     @ManyToOne
-    @JoinColumn(name = "wl_product", referencedColumnName = "pro_id")
+    @JoinColumn(name = "wlh_product", referencedColumnName = "pro_id")
     private Product product;
 
-    @Column(name = "wl_state")
+    @Column(name = "wlh_operation")
+    private String operation;
+
+    @Column(name = "wlh_state")
     private String state;
 
-    public WishList() {
+    public WishListHis() {
 
     }
 
-    public WishList(long id, LocalDateTime createDate, LocalDateTime updateDate, int quantity, Client client,
-            Product product, String state) {
+    public WishListHis(long id, WishList wishList, String operation) {
         this.id = id;
-        this.createDate = createDate;
-        this.updateDate = updateDate;
-        this.quantity = quantity;
-        this.client = client;
-        this.product = product;
-        this.state = state;
+        this.wishList = wishList;
+        this.createDate = wishList.getCreateDate();
+        this.updateDate = wishList.getUpdateDate();
+        this.quantity = wishList.getQuantity();
+        this.client = wishList.getClient();
+        this.product = wishList.getProduct();
+        this.state = wishList.getState();
+        this.operation = operation;
     }
 
     public long getId() {
         return id;
     }
 
+
     public void setId(long id) {
         this.id = id;
     }
+
+
+    public WishList getWishList() {
+        return wishList;
+    }
+
+
+    public void setWishList(WishList wishList) {
+        this.wishList = wishList;
+    }
+
 
     public LocalDateTime getCreateDate() {
         return createDate;
     }
 
+
     public void setCreateDate(LocalDateTime createDate) {
         this.createDate = createDate;
     }
+
 
     public LocalDateTime getUpdateDate() {
         return updateDate;
     }
 
+
     public void setUpdateDate(LocalDateTime updateDate) {
         this.updateDate = updateDate;
     }
+
 
     public int getQuantity() {
         return quantity;
     }
 
+
     public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
+
 
     public Client getClient() {
         return client;
     }
 
+
     public void setClient(Client client) {
         this.client = client;
     }
+
 
     public Product getProduct() {
         return product;
     }
 
+
     public void setProduct(Product product) {
         this.product = product;
+    }
+
+    public String getOperation() {
+        return operation;
+    }
+
+    public void setOperation(String operation) {
+        this.operation = operation;
     }
 
     public String getState() {
@@ -127,8 +152,10 @@ public class WishList implements Serializable{
 
     @Override
     public String toString() {
-        return "WishList [client=" + client + ", createDate=" + createDate + ", id=" + id + ", product=" + product
-                + ", quantity=" + quantity + ", state=" + state + ", updateDate=" + updateDate + "]";
+        return "WishListHis [client=" + client + ", createDate=" + createDate + ", id=" + id + ", operation="
+                + operation + ", product=" + product + ", quantity=" + quantity + ", state=" + state + ", updateDate="
+                + updateDate + ", wishList=" + wishList + "]";
     }
+
 
 }

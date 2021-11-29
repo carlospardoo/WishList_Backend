@@ -40,14 +40,25 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public Optional<Product> getProduct(int proId) {
-        // TODO Auto-generated method stub
-        return null;
+        Optional<Product> product = productDAO.findById(proId);
+
+        if (product.isPresent()) {
+            return product;
+        }
+
+        return Optional.empty();
     }
 
+
     @Override
-    public boolean productHasStock(int proId) {
-        // TODO Auto-generated method stub
-        return false;
+    public boolean productHasStock(int proId, int quantity) {
+        Optional<Product> product = getProduct(proId);
+        if (product.isPresent()) {
+            if (quantity > product.get().getStock()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override

@@ -7,6 +7,17 @@ public class ClientDTO {
 
     private String username;
 
+    public ClientDTO() {
+
+    }
+
+    public ClientDTO(long document, String name, String username) {
+        this.document = document;
+        this.name = name;
+        this.username = username;
+    }
+
+
     public long getDocument() {
         return document;
     }

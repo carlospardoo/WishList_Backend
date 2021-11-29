@@ -10,7 +10,11 @@ import com.carvajal.ebusiness.dto.ClientDTO;
 //import com.carvajal.ebusiness.dto.ProductDTO;
 import com.carvajal.ebusiness.dto.WishListDTO;
 import com.carvajal.ebusiness.model.Client;
+import com.carvajal.ebusiness.model.Operations;
+import com.carvajal.ebusiness.model.States;
 import com.carvajal.ebusiness.model.WishList;
+import com.carvajal.ebusiness.model.WishListHis;
+import com.carvajal.ebusiness.service.WishListHisService;
 import com.carvajal.ebusiness.service.WishListService;
 
 import org.slf4j.Logger;
@@ -25,6 +29,12 @@ public class WishListServiceImpl implements WishListService{
 
     @Autowired
     private WishListDAO wishListDAO;
+
+    @Autowired
+    private WishListHisService wlhService;
+
+    @Autowired
+    private ProductServiceImpl pService;
 
     @Override
     public List<WishListDTO> loadClientWishList(ClientDTO client) {
@@ -44,7 +54,8 @@ public class WishListServiceImpl implements WishListService{
                 wl.getUpdateDate(), 
                 wl.getQuantity(), 
                 wl.getClient(), 
-                wl.getProduct()
+                wl.getProduct(),
+                wl.getState()
                 );
             wlDTO.add(aux);
         });
@@ -53,17 +64,30 @@ public class WishListServiceImpl implements WishListService{
 
     @Override
     public boolean deleteProductFromWishList(long id) {
-        try {
-            wishListDAO.deleteById(id);
-        } catch (Exception e) {
+        Optional<WishList> wl = wishListDAO.findById(id);
+
+        if (wl.isPresent()) {
+            wl.get().setState(States.D.name());
+            wishListDAO.save(wl.get());
+            //wishListDAO.deleteById(id);
+
+            /*ADDING HISTORIC */
+            wlhService.addWishListHis(new WishListHis(
+                wl.get().getId(), 
+                wl.get(), 
+                Operations.DELETE.name()
+            ));
+            
+            return true;
+
+        } else {
             return false;
         }
-        
-        return true;
+
     }
 
     @Override
-    public Optional<WishListDTO> addProductToWishList(WishList parameters) {
+    public Optional<WishListDTO> addProductToWishList(WishListDTO parameters) {
         Optional<WishList> aux = wishListDAO.findById(parameters.getId());
         if(aux.isPresent()){
             return Optional.empty();
@@ -71,7 +95,24 @@ public class WishListServiceImpl implements WishListService{
         else{
             parameters.setCreateDate(LocalDateTime.now());
             parameters.setUpdateDate(LocalDateTime.now());
-            WishList newProduct = wishListDAO.save(parameters);
+            WishList wl = new WishList(
+                parameters.getId(), 
+                parameters.getCreateDate(), 
+                parameters.getUpdateDate(),
+                parameters.getQuantity(), 
+                parameters.getClient(), 
+                parameters.getProduct(),
+                States.V.name()
+            );
+            WishList newProduct = wishListDAO.save(wl);
+
+            /*ADDING HISTORIC */
+            wlhService.addWishListHis(new WishListHis(
+                newProduct.getId(), 
+                newProduct, 
+                Operations.INSERT.name()
+            ));
+
             WishListDTO productDTO = new WishListDTO();
             productDTO.setId(newProduct.getId());
             productDTO.setProduct(newProduct.getProduct());
@@ -86,14 +127,30 @@ public class WishListServiceImpl implements WishListService{
     }
 
     @Override
-    public Optional<WishListDTO> updateProductInWishList(WishList parameters) {
+    public Optional<WishListDTO> updateProductInWishList(WishListDTO parameters) {
         Optional<WishList> aux = wishListDAO.findById(parameters.getId());
         if(!aux.isPresent()){
             return Optional.empty();
         }
         else{
             parameters.setUpdateDate(LocalDateTime.now());
-            WishList newProduct = wishListDAO.save(parameters);
+            WishList newProduct = wishListDAO.save(new WishList(
+                parameters.getId(), 
+                parameters.getCreateDate(), 
+                parameters.getUpdateDate(), 
+                parameters.getQuantity(), 
+                parameters.getClient(), 
+                parameters.getProduct(),
+                States.V.name()
+            ));
+
+            /*ADDING HISTORIC */
+            wlhService.addWishListHis(new WishListHis(
+                newProduct.getId(), 
+                newProduct, 
+                Operations.UPDATE.name()
+            ));
+            
             WishListDTO productDTO = new WishListDTO();
             productDTO.setId(newProduct.getId());
             productDTO.setProduct(newProduct.getProduct());
@@ -104,6 +161,32 @@ public class WishListServiceImpl implements WishListService{
 
             return Optional.of(productDTO);
         }
+    }
+
+    @Override
+    public List<WishListDTO> productsWithoutStock(ClientDTO parameters) {
+        List<WishListDTO> prWithoutStock = new ArrayList<>();
+        
+        ClientDTO client = new ClientDTO(
+            parameters.getDocument(), 
+            parameters.getName(), 
+            parameters.getUsername()
+        );
+        List<WishListDTO> wlClient = loadClientWishList(client);
+
+        if (wlClient.isEmpty()) {
+            return null;
+        } else {
+            wlClient.forEach(cli ->{
+
+                if (!pService.productHasStock(cli.getProduct().getId(), cli.getQuantity())
+                    && !cli.getState().equals(States.D.name())) {
+                    prWithoutStock.add(cli);
+                }
+            });
+        }
+
+        return prWithoutStock;
     }
     
 }

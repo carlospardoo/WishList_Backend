@@ -21,9 +21,9 @@ public class ProductController {
     private ProductServiceImpl productService;
 
     @GetMapping(value = "/load-products")
-    @ResponseStatus(value = HttpStatus.ACCEPTED )
+    @ResponseStatus(value = HttpStatus.FOUND )
     public List<ProductDTO> sendFullProducts(){
-        productService.saveProducts(productService.productsDefault());
+        //productService.saveProducts(productService.productsDefault());
 
         List<ProductDTO> products = productService.getAllProducts();
         if (products.isEmpty()) {

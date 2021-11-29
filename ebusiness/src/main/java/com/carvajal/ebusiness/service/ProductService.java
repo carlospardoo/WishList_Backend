@@ -12,7 +12,7 @@ public interface ProductService {
 
     public Optional<Product> getProduct(int proId);
 
-    public boolean productHasStock(int proId);
+    public boolean productHasStock(int proId, int quantity);
 
     public List<Product> saveProducts(List<Product> products);
     
