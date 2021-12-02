@@ -12,19 +12,19 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 //@RunWith(SpringRunner.class)
-@SpringBootTest
+//@SpringBootTest
 public class ClientTest {
     
     Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Autowired
-    private ClientServiceImpl clService;
+   // @Autowired
+    //private ClientServiceImpl clService;
 
-    @Test
+    /*@Test
     public void loadClientsTest(){
         logger.info("Testing getallClients Method");
         assertNotNull(clService.getAllClients(), "failed test on: "+clService.getClass().getName());
         logger.info("Succeed?");
-    }
+    }*/
 
 }
