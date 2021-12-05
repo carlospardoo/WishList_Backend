@@ -1,15 +1,25 @@
 package com.carvajal.ebusiness.service.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.carvajal.ebusiness.dao.ClientDAO;
 import com.carvajal.ebusiness.dto.ClientDTO;
 import com.carvajal.ebusiness.model.Client;
+import com.carvajal.ebusiness.model.Rol;
+import com.carvajal.ebusiness.security.Security;
 import com.carvajal.ebusiness.service.ClientService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,8 +28,15 @@ public class ClientServiceImpl implements ClientService {
     @Autowired
     private ClientDAO cliDAO;
 
+    @Autowired
+    private Security security;
+
     public Client clientDefault(){
-        Client cli1 = new Client(1569874620, "carlos", "postgres");
+        HashSet<Rol> rolClient = new HashSet<>();
+        Rol rClient = new Rol();
+        rClient.setName("ROL_CLIENT");
+        rolClient.add(rClient);
+        Client cli1 = new Client(1569874620, "carlos", "postgres",security.passwordEncoder().encode("123"),rolClient);
         return cli1;
     }
 
@@ -42,10 +59,27 @@ public class ClientServiceImpl implements ClientService {
             clientDTO.add(new ClientDTO(
                 cli.getDocument(), 
                 cli.getName(), 
-                cli.getUsername()
+                cli.getUsername(),
+                cli.getPassword()
             ));
         });
 
         return clientDTO;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<Client> client = cliDAO.findByUsername(username);
+        if (client.isEmpty()) {
+            throw new UsernameNotFoundException("Usuario o contraseña inválidos");
+        }
+        return new User(client.get().getName(), client.get().getPassword(), mapAuthoritiesRoles(client.get().getRoles()));
+    }
+
+    private Collection<? extends GrantedAuthority> mapAuthoritiesRoles(Collection<Rol> roles){
+        return roles.stream()
+            .map(r -> new SimpleGrantedAuthority(r.getName()))
+            .collect(Collectors.toList()
+        );
     }
 }

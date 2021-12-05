@@ -14,6 +14,7 @@ import com.carvajal.ebusiness.model.Operations;
 import com.carvajal.ebusiness.model.States;
 import com.carvajal.ebusiness.model.WishList;
 import com.carvajal.ebusiness.model.WishListHis;
+import com.carvajal.ebusiness.security.Security;
 import com.carvajal.ebusiness.service.WishListHisService;
 import com.carvajal.ebusiness.service.WishListService;
 
@@ -36,6 +37,9 @@ public class WishListServiceImpl implements WishListService{
     @Autowired
     private ProductServiceImpl pService;
 
+    @Autowired
+    private Security security;
+
     @Override
     public List<WishListDTO> loadClientWishList(ClientDTO client) {
 
@@ -43,7 +47,7 @@ public class WishListServiceImpl implements WishListService{
 
         List<WishListDTO> wlDTO = new ArrayList<>();
 
-        Client cliAux = new Client(client.getDocument(), client.getName(), client.getUsername());
+        Client cliAux = new Client(client.getDocument(), client.getName(), client.getUsername(),security.passwordEncoder().encode(client.getPassword()),null);
 
         List<WishList> wishlist = wishListDAO.findByClient(cliAux);
         wishlist.forEach(wl ->{
@@ -170,7 +174,8 @@ public class WishListServiceImpl implements WishListService{
         ClientDTO client = new ClientDTO(
             parameters.getDocument(), 
             parameters.getName(), 
-            parameters.getUsername()
+            parameters.getUsername(),
+            parameters.getPassword()
         );
         List<WishListDTO> wlClient = loadClientWishList(client);
 
