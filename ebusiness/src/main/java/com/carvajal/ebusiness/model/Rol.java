@@ -16,6 +16,9 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 @Entity
 @Table(name = "rol")
 public class Rol {
@@ -28,6 +31,7 @@ public class Rol {
     @Column(name = "rol_name", nullable = false)
     private String name;
 
+    @Fetch(FetchMode.JOIN)
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE) //, cascade = CascadeType.ALL
     @JoinTable(name = "rol_client", 
         joinColumns = @JoinColumn(name = "rlc_rol", referencedColumnName = "rol_id"),

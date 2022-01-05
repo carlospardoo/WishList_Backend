@@ -36,6 +36,7 @@ public class Client implements Serializable{
     @Column(name = "cli_password")
     private String password;
 
+    @Fetch(FetchMode.JOIN)
     @ManyToMany(mappedBy = "clients", fetch = FetchType.LAZY, cascade = CascadeType.MERGE) //, cascade = CascadeType.ALL
     private Set<Rol> roles = new HashSet<>();
 
