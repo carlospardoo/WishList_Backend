@@ -5,16 +5,20 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.carvajal.ebusiness.dao.ClientDAO;
 import com.carvajal.ebusiness.dto.ClientDTO;
+import com.carvajal.ebusiness.mapper.RolMapper;
 import com.carvajal.ebusiness.model.Client;
 import com.carvajal.ebusiness.model.Rol;
 import com.carvajal.ebusiness.security.Security;
 import com.carvajal.ebusiness.service.ClientService;
+import com.carvajal.ebusiness.service.RolService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -22,21 +26,28 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-@Service
+@Service("clientServiceImpl")
 public class ClientServiceImpl implements ClientService {
 
     @Autowired
     private ClientDAO cliDAO;
 
     @Autowired
+    @Qualifier("rolServiceImpl")
+    private RolService rService;
+
     private Security security;
 
     public Client clientDefault(){
-        HashSet<Rol> rolClient = new HashSet<>();
-        Rol rClient = new Rol();
-        rClient.setName("ROL_CLIENT");
-        rolClient.add(rClient);
-        Client cli1 = new Client(1569874620, "carlos", "postgres",security.passwordEncoder().encode("123"),rolClient);
+        //Set<Rol> rolClient = new HashSet<>();
+        //rService = new RolServiceImpl();
+        //Convert from RolDTO to ROL
+        Rol rClient = RolMapper.rolDtoToRol(rService.addRol("ROL_CLIENT"));
+        //Rol rClient = new Rol();
+        //rClient.setName("ROL_CLIENT");
+        //rolClient.add(rClient);
+        Client cli1 = new Client(1569874620, "carlos", "postgres",security.passwordEncoder().encode("123"));
+        cli1.addRol(rClient);
         return cli1;
     }
 

@@ -47,7 +47,7 @@ public class WishListServiceImpl implements WishListService{
 
         List<WishListDTO> wlDTO = new ArrayList<>();
 
-        Client cliAux = new Client(client.getDocument(), client.getName(), client.getUsername(),security.passwordEncoder().encode(client.getPassword()),null);
+        Client cliAux = new Client(client.getDocument(), client.getName(), client.getUsername(),security.passwordEncoder().encode(client.getPassword()));
 
         List<WishList> wishlist = wishListDAO.findByClient(cliAux);
         wishlist.forEach(wl ->{

@@ -1,11 +1,15 @@
 package com.carvajal.ebusiness.model;
 
 import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -17,32 +21,33 @@ import javax.persistence.Table;
 public class Rol {
     
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "rol_id")
     private int id;
 
     @Column(name = "rol_name", nullable = false)
     private String name;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE) //, cascade = CascadeType.ALL
     @JoinTable(name = "rol_client", 
         joinColumns = @JoinColumn(name = "rlc_rol", referencedColumnName = "rol_id"),
         inverseJoinColumns = @JoinColumn(name = "rlc_client", referencedColumnName = "cli_id") 
     )
-    private HashSet<Client> clients;
+    private Set<Client> clients = new HashSet<>();
 
     public Rol() {
-
+        super();
+        // this.clients = new HashSet<>();
     }
 
-    public Rol(int id, String name, HashSet<Client> clients) {
+    public Rol(int id, String name) {
         this.id = id;
         this.name = name;
-        this.clients = clients;
     }
     
-    public Rol(String name, HashSet<Client> clients) {
+    public Rol(String name) {
         this.name = name;
-        this.clients = clients;
+        // this.clients = clients;
     }
 
     public int getId() {
@@ -61,12 +66,22 @@ public class Rol {
         this.name = name;
     }
 
-    public HashSet<Client> getClients() {
+    public Set<Client> getClients() {
         return clients;
     }
 
-    public void setClients(HashSet<Client> clients) {
+    public void setClients(Set<Client> clients) {
         this.clients = clients;
+    }
+
+    public void addClient(Client client){
+        this.clients.add(client);
+        client.getRoles().add(this);
+    }
+
+    public void removeClient(Client client){
+        this.clients.remove(client);
+        client.getRoles().remove(this);
     }
 
     @Override

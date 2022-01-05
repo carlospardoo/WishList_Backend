@@ -1,8 +1,10 @@
 package com.carvajal.ebusiness.security;
 
 import com.carvajal.ebusiness.service.ClientService;
+import com.carvajal.ebusiness.service.impl.ClientServiceImpl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -18,10 +20,11 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 public class Security extends WebSecurityConfigurerAdapter{
 
     @Autowired
+    @Qualifier("clientServiceImpl")
     private ClientService cService;
     
     @Bean
-    public BCryptPasswordEncoder passwordEncoder(){
+    public static BCryptPasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
 
@@ -33,6 +36,7 @@ public class Security extends WebSecurityConfigurerAdapter{
      */
     @Bean
     public DaoAuthenticationProvider authenticationProvider(){
+        
         DaoAuthenticationProvider auth = new DaoAuthenticationProvider();
         auth.setUserDetailsService(cService);
         auth.setPasswordEncoder(passwordEncoder());
@@ -53,7 +57,7 @@ public class Security extends WebSecurityConfigurerAdapter{
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
         .antMatchers( //List of routes to doing something
-            "/**",
+            //"/**",
             "/js/**",
             "/css/**",
             "/img/**"
