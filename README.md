@@ -1,4 +1,4 @@
-# Prueba_Carvajal_Backend
+# Wish List Backend
 
 ## Base de Datos
 
@@ -6,11 +6,11 @@
 
 2. al instalar, crear usuario postgres con contraseña carlos
 
-3. Crear base de datos carvajal
+3. Crear base de datos
 
 ```
-create database carvajal;
-\c carvajal;
+create database wishlist;
+\c wishlist;
 ```
 
 ## Despliegue
@@ -32,10 +32,10 @@ create database carvajal;
 Tener en cuenta la siguiente ruta de acceso:
 
 ```
-jdbc:postgresql://localhost:5432/carvajal
+jdbc:postgresql://localhost:5432/wishlist
 ```
 
-Acceder en local con localhost y el puerto. Puerto puede variar (5432 en este caso), mirar en postgresql el puerto y cambiar al puerto adecuado. Base de datos **carvajal**
+Acceder en local con localhost y el puerto. Puerto puede variar (5432 en este caso), mirar en postgresql el puerto y cambiar al puerto adecuado. Base de datos **wishlist**
 
 ### Endpoints
 
